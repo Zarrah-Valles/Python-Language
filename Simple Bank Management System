@@ -1,0 +1,135 @@
+class Account:
+    def __init__(self, acctNo: int, fullName: str):
+        self.__acctNo = acctNo
+        self.__fullName = fullName
+        self.__balance = 0.0  
+
+    def get_acctNo(self):
+        return self.__acctNo
+
+    def get_fullName(self):
+        return self.__fullName
+
+    def inquire(self):
+        return self.__balance
+
+    def deposit(self, amount: float):
+        if amount > 0:
+            self.__balance += amount
+            return True
+        else:
+            return False
+
+    def withdraw(self, amount: float):
+        if 0 < amount <= self.__balance:
+            self.__balance -= amount
+            return True
+        else:
+            return False
+
+
+class BankSystem:
+    def __init__(self):
+        self.accounts = []
+
+    def open_account(self, acctNo: int, fullName: str):
+        for acc in self.accounts:
+            if acc.get_acctNo() == acctNo:
+                print("Account already exists.")
+                return
+        new_acc = Account(acctNo, fullName)
+        self.accounts.append(new_acc)
+        print(f"Account {acctNo} opened for {fullName}.")
+
+    def close_account(self, acctNo: int):
+        for acc in self.accounts:
+            if acc.get_acctNo() == acctNo:
+                if acc.inquire() == 0:
+                    self.accounts.remove(acc)
+                    print(f"Account {acctNo} closed.")
+                else:
+                    print("Cannot close account. Balance is not zero.")
+                return
+        print("Account not found.")
+
+    def deposit_to_account(self, acctNo: int, amount: float):
+        for acc in self.accounts:
+            if acc.get_acctNo() == acctNo:
+                if acc.deposit(amount):
+                    print(f"Deposited {amount} to {acctNo}.")
+                else:
+                    print("Deposit failed.")
+                return
+        print("Account not found.")
+
+    def withdraw_from_account(self, acctNo: int, amount: float):
+        for acc in self.accounts:
+            if acc.get_acctNo() == acctNo:
+                if acc.withdraw(amount):
+                    print(f"Withdrew {amount} from {acctNo}.")
+                else:
+                    print("Withdrawal failed. Check balance or amount.")
+                return
+        print("Account not found.")
+
+    def get_report(self):
+        print("\nAccount Number | Full Name | Balance")
+        for acc in self.accounts:
+            print(f"{acc.get_acctNo()} | {acc.get_fullName()} | {acc.inquire():.2f}")
+        print()
+
+
+
+bank = BankSystem()
+
+while True:
+    print("\n=== BANK MENU ===")
+    print("[1] Open Account")
+    print("[2] Inquire Balance")
+    print("[3] Deposit")
+    print("[4] Withdraw")
+    print("[5] Close Account")
+    print("[6] Report")
+    print("[7] Quit")
+
+    choice = input("Enter choice: ")
+
+    if choice == "1":
+        acctNo = int(input("Enter new Account Number: "))
+        name = input("Enter Full Name: ")
+        bank.open_account(acctNo, name)
+
+    elif choice == "2":
+        acctNo = int(input("Enter Account Number: "))
+        found = False
+        for acc in bank.accounts:
+            if acc.get_acctNo() == acctNo:
+                print(f"Current Balance for {acc.get_fullName()}: {acc.inquire():.2f}")
+                found = True
+                break
+        if not found:
+            print("Account not found.")
+
+    elif choice == "3":
+        acctNo = int(input("Enter Account Number: "))
+        amount = float(input("Enter amount to deposit: "))
+        bank.deposit_to_account(acctNo, amount)
+
+    elif choice == "4":
+        acctNo = int(input("Enter Account Number: "))
+        amount = float(input("Enter amount to withdraw: "))
+        bank.withdraw_from_account(acctNo, amount)
+
+    elif choice == "5":
+        acctNo = int(input("Enter Account Number to close: "))
+        bank.close_account(acctNo)
+
+    elif choice == "6":
+        bank.get_report()
+
+    elif choice == "7":
+        print("Thank you for using the bank system.")
+        break
+
+    else:
+        print("Invalid choice. Please try again.")
