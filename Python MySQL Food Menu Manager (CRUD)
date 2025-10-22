@@ -1,0 +1,96 @@
+import mysql.connector
+
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",  
+    database="Food"  
+)
+cursor = conn.cursor()
+
+def add_record():
+    name = input("Enter food name: ")
+    category = input("Enter category: ")
+    price = input("Enter price: ")
+    cursor.execute(
+        "INSERT INTO Jollibee (name, category, price) VALUES (%s, %s, %s)",
+        (name, category, price)
+    )
+    conn.commit()
+    print("Record added successfully.")
+
+def list_records():
+    cursor.execute("SELECT * FROM Jollibee")
+    rows = cursor.fetchall()
+    if rows:
+        print("\nID | Name | Category | Price | Created At")
+        print("-----------------------------------------")
+        for row in rows:
+            print(f"{row[0]} | {row[1]} | {row[2]} | {row[3]} | {row[4]}")
+    else:
+        print("No records found.")
+
+def search_record():
+    id = input("Enter ID to search: ")
+    cursor.execute("SELECT * FROM Jollibee WHERE id=%s", (id,))
+    row = cursor.fetchone()
+    if row:
+        print(f"ID: {row[0]}\nName: {row[1]}\nCategory: {row[2]}\nPrice: {row[3]}\nCreated At: {row[4]}")
+    else:
+        print("Record not found.")
+
+def update_record():
+    id = input("Enter ID to update: ")
+    cursor.execute("SELECT * FROM Jollibee WHERE id=%s", (id,))
+    row = cursor.fetchone()
+    if row:
+        name = input("Enter new name: ")
+        category = input("Enter new category: ")
+        price = input("Enter new price: ")
+        cursor.execute(
+            "UPDATE Jollibee SET name=%s, category=%s, price=%s WHERE id=%s",
+            (name, category, price, id)
+        )
+        conn.commit()
+        print("Record updated successfully.")
+    else:
+        print("Record not found.")
+
+def delete_record():
+    id = input("Enter ID to delete: ")
+    cursor.execute("DELETE FROM Jollibee WHERE id=%s", (id,))
+    conn.commit()
+    
+    cursor.execute("SELECT IFNULL(MAX(id), 0) + 1 FROM Jollibee")
+    next_id = cursor.fetchone()[0]
+    cursor.execute(f"ALTER TABLE Jollibee AUTO_INCREMENT = {next_id}")
+    conn.commit()
+    print("Record deleted successfully.")
+
+
+
+while True:
+    print("\n=== CRUD Program - Jollibee Food ===")
+    print("1. Add Record")
+    print("2. Search Record")
+    print("3. List Records")
+    print("4. Update Record")
+    print("5. Delete Record")
+    print("6. Exit")
+    choice = input("Choose an option: ")
+
+    if choice == '1':
+        add_record()
+    elif choice == '2':
+        search_record()
+    elif choice == '3':
+        list_records()
+    elif choice == '4':
+        update_record()
+    elif choice == '5':
+        delete_record()
+    elif choice == '6':
+        print("Exiting program.")
+        break
+    else:
+        print("Invalid choice.")
